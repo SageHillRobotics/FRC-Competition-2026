@@ -6,19 +6,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.List;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -83,16 +74,5 @@ public class RobotContainer {
         // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
-    }
-
-    public Command getAutonomousCommand() {
-        TrajectoryConfig config = new TrajectoryConfig(MaxSpeed, 3.0).setKinematics(drivetrain.getKinematics());
-        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            new Pose2d(3.0, 0.0, new Rotation2d(0.0)),
-            config
-        );
-        return Commands.print("work in progress");
     }
 }

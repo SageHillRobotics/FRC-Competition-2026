@@ -10,9 +10,12 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,6 +33,20 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    private PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    private PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    private PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+    
+    public void followTrajectory(SwerveSample sample) {
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
+        setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(
+            sample.vx + xController.calculate(getState().Pose.getX(), sample.x),
+            sample.vy + yController.calculate(getState().Pose.getY(), sample.y),
+            sample.omega + headingController.calculate(getState().Pose.getRotation().getRadians(), sample.heading)
+        )));
+    }
+
+    //! GENERATED CODE: DO NOT MODIFY!
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
