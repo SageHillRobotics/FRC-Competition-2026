@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
     private final RobotContainer m_robotContainer;
 
-    Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("10m_forward");
+    Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("10m_square");
     Timer autoTimer = new Timer();
 
     public Robot() {

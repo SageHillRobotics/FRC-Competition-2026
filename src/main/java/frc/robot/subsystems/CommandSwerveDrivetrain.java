@@ -33,20 +33,38 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private PIDController xController = new PIDController(10.0, 0.0, 0.0);
-    private PIDController yController = new PIDController(10.0, 0.0, 0.0);
-    private PIDController headingController = new PIDController(7.5, 0.0, 0.0);
+    private PIDController autoXController = new PIDController(10.0, 0.0, 0.0);
+    private PIDController autoYController = new PIDController(10.0, 0.0, 0.0);
+    private PIDController autoHeadingController = new PIDController(7.0, 0.0, 0.0);
     
+    /**
+     * Follows the given field-centric path sample with PID.
+     *
+     * @param sample Sample along the path to follow
+     */
     public void followTrajectory(SwerveSample sample) {
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
-        setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(
-            sample.vx + xController.calculate(getState().Pose.getX(), sample.x),
-            sample.vy + yController.calculate(getState().Pose.getY(), sample.y),
-            sample.omega + headingController.calculate(getState().Pose.getRotation().getRadians(), sample.heading)
-        )));
+        autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        var pose = getState().Pose;
+
+        var targetSpeeds = sample.getChassisSpeeds();
+        targetSpeeds.vxMetersPerSecond += autoXController.calculate(
+            pose.getX(), sample.x
+        );
+        targetSpeeds.vyMetersPerSecond += autoYController.calculate(
+            pose.getY(), sample.y
+        );
+        targetSpeeds.omegaRadiansPerSecond += autoHeadingController.calculate(
+            pose.getRotation().getRadians(), sample.heading
+        );
+
+        setControl(
+            new SwerveRequest.ApplyFieldSpeeds().withSpeeds(targetSpeeds)
+                .withWheelForceFeedforwardsX(sample.moduleForcesX())
+                .withWheelForceFeedforwardsY(sample.moduleForcesY())
+        );
     }
 
-    //! GENERATED CODE: DO NOT MODIFY!
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
