@@ -4,30 +4,17 @@
 
 package frc.robot;
 
-import java.util.Optional;
-
-import choreo.Choreo;
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
     private final RobotContainer m_robotContainer;
-
-    Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("10m_square");
-    Timer autoTimer = new Timer();
+    
+    private Command m_autonomousCommand;
 
     public Robot() {
         m_robotContainer = new RobotContainer();
-    }
-
-    public boolean isRedAlliance() {
-        return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
     }
 
     @Override
@@ -49,23 +36,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        if (trajectory.isPresent()) {
-            Optional<Pose2d> initialPose = trajectory.get().getInitialPose(isRedAlliance());
-            if (initialPose.isPresent()) {
-                m_robotContainer.drivetrain.resetPose(initialPose.get());
-            }
+        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.schedule();
         }
-        autoTimer.restart();
     }
 
     @Override
     public void autonomousPeriodic() {
-        if (trajectory.isPresent()) {
-            Optional<SwerveSample> sample = trajectory.get().sampleAt(autoTimer.get(), isRedAlliance());
-            if (sample.isPresent()) {
-                m_robotContainer.drivetrain.followTrajectory(sample.get());
-            }
-        }
+        
     }
 
     @Override
@@ -74,6 +54,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+        }
     }
 
     @Override
