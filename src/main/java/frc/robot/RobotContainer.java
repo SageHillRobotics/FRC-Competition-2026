@@ -74,6 +74,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.sequence(
+            autoFactory.resetOdometry("1m_forward"),
             autoFactory.trajectoryCmd("1m_forward")
         );
     }
