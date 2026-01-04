@@ -89,7 +89,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.sequence(
-            autoFactory.trajectoryCmd("5m_forward")
+            autoFactory.trajectoryCmd("1m_forward")
         );
     }
 }
