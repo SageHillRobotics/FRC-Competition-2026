@@ -4,9 +4,10 @@
  "snapshot":{
   "waypoints":[
     {"x":0.0, "y":0.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":10.0, "y":0.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":10.0, "y":10.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":0.0, "y":10.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":10.0, "y":0.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":10.0, "y":10.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":0.0, "y":10.0, "heading":0.0, "intervals":0, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":0.0, "y":10.0, "heading":0.0, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
     {"x":0.0, "y":0.0, "heading":0.0, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -17,9 +18,10 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"10 m", "val":10.0}, "y":{"exp":"0 m", "val":0.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"10 m", "val":10.0}, "y":{"exp":"10 m", "val":10.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"10 m", "val":10.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"10 m", "val":10.0}, "y":{"exp":"0 m", "val":0.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":{"exp":"10 m", "val":10.0}, "y":{"exp":"10 m", "val":10.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"10 m", "val":10.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":0, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"10 m", "val":10.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":52, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
     {"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -32,7 +34,7 @@
  },
  "trajectory":{
   "sampleType":"Swerve",
-  "waypoints":[0.0,2.35434,4.48551,6.61668,8.97101],
+  "waypoints":[0.0,2.35434,4.48551,6.61668,6.61668,8.97101],
   "samples":[
     {"t":0.0, "x":0.0, "y":0.0, "heading":0.0, "vx":0.0, "vy":0.0, "omega":0.0, "ax":8.98235, "ay":-0.8081, "alpha":0.0, "fx":[152.78726,152.78726,152.78726,152.78726], "fy":[-13.74548,-13.74548,-13.74548,-13.74548]},
     {"t":0.04528, "x":0.00921, "y":-0.00083, "heading":0.0, "vx":0.40668, "vy":-0.03659, "omega":0.0, "ax":8.9816, "ay":-0.80803, "alpha":0.0, "fx":[152.77442,152.77442,152.77442,152.77442], "fy":[-13.74433,-13.74433,-13.74433,-13.74433]},

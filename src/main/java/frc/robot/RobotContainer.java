@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -43,7 +44,7 @@ public class RobotContainer {
             () -> drivetrain.getState().Pose,
             drivetrain::resetPose,
             drivetrain::followTrajectory,
-            true,
+            false,
             drivetrain);
         
         configureBindings();
@@ -80,13 +81,15 @@ public class RobotContainer {
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // // reset the field-centric heading on left bumper press
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // reset the field-centric heading on left bumper press
+        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     public Command getAutonomousCommand() {
-        return autoFactory.trajectoryCmd("1m_square");
+        return Commands.sequence(
+            autoFactory.trajectoryCmd("5m_forward")
+        );
     }
 }
