@@ -87,6 +87,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoFactory.trajectoryCmd("10m_square");
+        return autoFactory.trajectoryCmd("1m_square");
     }
 }
