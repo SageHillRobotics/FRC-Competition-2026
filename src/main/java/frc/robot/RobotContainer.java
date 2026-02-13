@@ -7,6 +7,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import choreo.auto.AutoFactory;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,6 +38,14 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
+
+    private AutoFactory autoFactory = new AutoFactory(
+        () -> drivetrain.getState().Pose,
+        drivetrain::resetPose,
+        drivetrain::followPath,
+        true,
+        drivetrain
+    );
 
     public RobotContainer() {
         configureBindings();
@@ -83,21 +94,9 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
         return Commands.sequence(
-            // Reset our field centric heading to match the robot
-            // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-            // Then slowly drive forward (away from us) for 5 seconds.
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)
-            )
-            .withTimeout(5.0),
-            // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
+            autoFactory.resetOdometry("simple_5m_relay"),
+            autoFactory.trajectoryCmd("simple_5m_relay")
         );
     }
 }

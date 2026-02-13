@@ -11,7 +11,9 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -34,6 +36,40 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    /** Swerve request to apply during field-centric path following */
+    private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
+    private final PIDController m_pathXController = new PIDController(10, 0, 0);
+    private final PIDController m_pathYController = new PIDController(10, 0, 0);
+    private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
+
+    /**
+     * Follows the given field-centric path sample with PID.
+     *
+     * @param sample Sample along the path to follow
+     */
+    public void followPath(SwerveSample sample) {
+        m_pathThetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        var pose = getState().Pose;
+
+        var targetSpeeds = sample.getChassisSpeeds();
+        targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(
+            pose.getX(), sample.x
+        );
+        targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(
+            pose.getY(), sample.y
+        );
+        targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
+            pose.getRotation().getRadians(), sample.heading
+        );
+
+        setControl(
+            m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds)
+                .withWheelForceFeedforwardsX(sample.moduleForcesX())
+                .withWheelForceFeedforwardsY(sample.moduleForcesY())
+        );
+    }
+
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
