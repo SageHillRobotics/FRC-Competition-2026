@@ -28,4 +28,9 @@ public class CommandIntake extends SubsystemBase {
             intakeMotor.set(0);
         }, this);
     }
+
+    @Override
+    public void periodic() {
+        System.out.println(pivotMotor.getPosition().getValueAsDouble());
+    }
 }
