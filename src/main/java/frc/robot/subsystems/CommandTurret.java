@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -30,6 +31,9 @@ public class CommandTurret extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -turretLimitRotations;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         turretMotor.getConfigurator().apply(config);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), turretMotor.getVelocity());
+        turretMotor.optimizeBusUtilization();
     }
 
     @Override
@@ -43,8 +47,10 @@ public class CommandTurret extends SubsystemBase {
     public void poseEstimate() {
         LimelightHelpers.SetRobotOrientation("limelight", drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
         PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        drivetrain.addVisionMeasurement(new Pose2d(poseEstimate.pose.getTranslation(), drivetrain.getPigeon2().getRotation2d()), poseEstimate.timestampSeconds);
+        if (poseEstimate != null && poseEstimate.tagCount > 0) {
+            drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+            drivetrain.addVisionMeasurement(new Pose2d(poseEstimate.pose.getTranslation(), drivetrain.getPigeon2().getRotation2d()), poseEstimate.timestampSeconds);
+        }
     }
 
     public void trackTarget() {
