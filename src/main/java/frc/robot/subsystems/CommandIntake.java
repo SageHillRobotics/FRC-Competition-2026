@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CommandIntake extends SubsystemBase {
-    private static double pivotDownPosition = 10; //! TODO: Tune pivotDownPosition
-    private static double pivotUpPosition = 0;
+    private static double pivotDownPosition = 4.16;
+    private static double pivotUpPosition = -0.15;
 
     private TalonFX intakeMotor = new TalonFX(14);
     private TalonFX pivotMotor = new TalonFX(15);
@@ -35,10 +35,5 @@ public class CommandIntake extends SubsystemBase {
             pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
             intakeMotor.set(0);
         }, this);
-    }
-
-    @Override
-    public void periodic() {
-        System.out.println("Pivot Rotations: " + pivotMotor.getPosition().getValueAsDouble());
     }
 }

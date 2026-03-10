@@ -40,8 +40,6 @@ public class CommandTurret extends SubsystemBase {
 
         poseEstimate();
         trackTarget();
-
-        System.out.println("Turret Rotations: " + turretMotor.getPosition().getValueAsDouble());
     }
 
     public void poseEstimate() {
