@@ -16,6 +16,8 @@ public class CommandIntake extends SubsystemBase {
 
     private PIDController pivotPID = new PIDController(0.1, 0, 0); //! TODO: Tune pivotPID
 
+    private boolean isPivotDown = false;
+
     public CommandIntake() {
         BaseStatusSignal.setUpdateFrequencyForAll(50, pivotMotor.getPosition(), pivotMotor.getVelocity());
         BaseStatusSignal.setUpdateFrequencyForAll(50, intakeMotor.getPosition(), intakeMotor.getVelocity());
@@ -25,15 +27,24 @@ public class CommandIntake extends SubsystemBase {
 
     public Command run() {
         return Commands.run(() -> {
-            pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
             intakeMotor.set(-1);
         }, this);
     }
 
     public Command idle() {
         return Commands.run(() -> {
-            pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
             intakeMotor.set(0);
+        }, this);
+    }
+
+    public Command togglePivot() {
+        return Commands.run(() -> {
+            isPivotDown = !isPivotDown;
+            if (isPivotDown) {
+                pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
+            } else {
+                pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
+            }
         }, this);
     }
 }

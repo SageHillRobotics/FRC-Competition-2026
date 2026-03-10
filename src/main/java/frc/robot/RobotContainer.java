@@ -60,6 +60,7 @@ public class RobotContainer {
 
         intake.setDefaultCommand(intake.idle());
         joystick.b().whileTrue(intake.run());
+        joystick.rightBumper().onTrue(intake.togglePivot());
 
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
