@@ -14,9 +14,7 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 public class CommandTurret extends SubsystemBase {
     private CommandSwerveDrivetrain drivetrain;
 
-    private static final double turretGearRatio = 4.0; //! TODO: Tune turretGearRatio
-    private static final double turretRangeDegrees = 300.0;
-    private static final double turretLimitRotations = (turretRangeDegrees / 360.0) * turretGearRatio / 2.0;
+    private static final double turretLimitRotations = 5; //! TODO: Tune turretLimitRotations
 
     private TalonFX turretMotor = new TalonFX(16);
 
@@ -42,6 +40,8 @@ public class CommandTurret extends SubsystemBase {
 
         poseEstimate();
         trackTarget();
+
+        System.out.println("Turret Rotations: " + turretMotor.getPosition().getValueAsDouble());
     }
 
     public void poseEstimate() {

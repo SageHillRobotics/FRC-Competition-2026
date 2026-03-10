@@ -39,6 +39,6 @@ public class CommandIntake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println(pivotMotor.getPosition().getValueAsDouble());
+        System.out.println("Pivot Rotations: " + pivotMotor.getPosition().getValueAsDouble());
     }
 }
