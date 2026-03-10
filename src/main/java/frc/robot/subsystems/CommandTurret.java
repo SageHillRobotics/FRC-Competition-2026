@@ -3,10 +3,12 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -17,6 +19,7 @@ public class CommandTurret extends SubsystemBase {
     private static final double turretLimitRotations = 5; //! TODO: Tune turretLimitRotations
 
     private TalonFX turretMotor = new TalonFX(16);
+    private SparkMax tunnelMotor = new SparkMax(17, SparkMax.MotorType.kBrushless);
 
     private PIDController turretPID = new PIDController(0.05, 0, 0); //! TODO: Tune turretPID
 
@@ -34,6 +37,18 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.optimizeBusUtilization();
     }
 
+    public Command run() {
+        return Commands.run(() -> {
+            tunnelMotor.set(1); //! Tune tunnelMotor direction
+        }, this);
+    }
+
+    public Command idle() {
+        return Commands.run(() -> {
+            tunnelMotor.set(0);
+        }, this);
+    }
+
     @Override
     public void periodic() {
         super.periodic();
@@ -45,10 +60,8 @@ public class CommandTurret extends SubsystemBase {
     public void poseEstimate() {
         LimelightHelpers.SetRobotOrientation("limelight", drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
         PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-        if (poseEstimate != null && poseEstimate.tagCount > 0) {
-            drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-            drivetrain.addVisionMeasurement(new Pose2d(poseEstimate.pose.getTranslation(), drivetrain.getPigeon2().getRotation2d()), poseEstimate.timestampSeconds);
-        }
+        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        drivetrain.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
     }
 
     public void trackTarget() {
