@@ -38,13 +38,17 @@ public class CommandIntake extends SubsystemBase {
     }
 
     public Command togglePivot() {
-        return Commands.run(() -> {
+        return Commands.runOnce(() -> {
             isPivotDown = !isPivotDown;
-            if (isPivotDown) {
-                pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
-            } else {
-                pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
-            }
-        }, this);
+        });
+    }
+
+    @Override
+    public void periodic() {
+        if (isPivotDown) {
+            pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
+        } else {
+            pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
+        }
     }
 }
