@@ -20,6 +20,8 @@ public class CommandTurret extends SubsystemBase {
 
     private TalonFX turretMotor = new TalonFX(16);
     private SparkMax tunnelMotor = new SparkMax(17, SparkMax.MotorType.kBrushless);
+    private TalonFX shooterMotorLeft = new TalonFX(18);
+    private TalonFX shooterMotorRight = new TalonFX(19);
 
     private PIDController turretPID = new PIDController(0.05, 0, 0); //! TODO: Tune turretPID
 
@@ -34,18 +36,27 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.getConfigurator().apply(config);
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), turretMotor.getVelocity());
+        BaseStatusSignal.setUpdateFrequencyForAll(50, shooterMotorLeft.getPosition(), shooterMotorLeft.getVelocity());
+        BaseStatusSignal.setUpdateFrequencyForAll(50, shooterMotorRight.getPosition(), shooterMotorRight.getVelocity());
         turretMotor.optimizeBusUtilization();
+        shooterMotorLeft.optimizeBusUtilization();
+        shooterMotorRight.optimizeBusUtilization();
     }
 
     public Command run() {
         return Commands.run(() -> {
             tunnelMotor.set(1); //! Tune tunnelMotor direction
+            shooterMotorLeft.set(1);
+            shooterMotorRight.set(-1);
         }, this);
     }
 
     public Command idle() {
         return Commands.run(() -> {
             tunnelMotor.set(0);
+            shooterMotorLeft.set(0);
+            shooterMotorRight.set(0);
+
         }, this);
     }
 
