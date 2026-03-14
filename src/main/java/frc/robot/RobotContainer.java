@@ -35,7 +35,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
-    // public final CommandTurret turret = new CommandTurret(drivetrain);
+    public final CommandTurret turret = new CommandTurret(drivetrain);
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
@@ -68,6 +68,12 @@ public class RobotContainer {
         );
 
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
+        turret.setDefaultCommand(turret.idle());
+        joystick.pov(90).whileTrue(turret.shooterTest(0.25));   // right
+        joystick.pov(0).whileTrue(turret.shooterTest(0.5));     // up
+        joystick.pov(270).whileTrue(turret.shooterTest(0.75));  // left
+        joystick.pov(180).whileTrue(turret.shooterTest(1.0));   // down
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
