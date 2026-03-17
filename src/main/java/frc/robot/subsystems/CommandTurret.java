@@ -1,15 +1,12 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,11 +27,11 @@ public class CommandTurret extends SubsystemBase {
         shooterPositionMap.put(1.0, 1.0); //! TODO: Populate shooterPositionMap
     }
 
-    private TalonFX turretMotor = new TalonFX(16);
-    private SparkMax tunnelMotor = new SparkMax(17, SparkMax.MotorType.kBrushless);
-    private TalonFX shooterMotorLeft = new TalonFX(18);
-    private TalonFX shooterMotorRight = new TalonFX(19);
-    private SparkMax hoodMotor = new SparkMax(20, SparkMax.MotorType.kBrushless);
+    private TalonFX turretMotor = new TalonFX(18);
+    private SparkMax tunnelMotor = new SparkMax(19, SparkMax.MotorType.kBrushless);
+    private TalonFX shooterMotorLeft = new TalonFX(22);
+    private TalonFX shooterMotorRight = new TalonFX(20);
+    private SparkMax hoodMotor = new SparkMax(21, SparkMax.MotorType.kBrushless);
 
     private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
     private PIDController hoodPID = new PIDController(0.1, 0, 0); //! TODO: Tune hoodPID
@@ -50,13 +47,6 @@ public class CommandTurret extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -turretLimitRotations;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         turretMotor.getConfigurator().apply(config);
-
-        BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), turretMotor.getVelocity());
-        BaseStatusSignal.setUpdateFrequencyForAll(50, shooterMotorLeft.getPosition(), shooterMotorLeft.getVelocity());
-        BaseStatusSignal.setUpdateFrequencyForAll(50, shooterMotorRight.getPosition(), shooterMotorRight.getVelocity());
-        turretMotor.optimizeBusUtilization();
-        shooterMotorLeft.optimizeBusUtilization();
-        shooterMotorRight.optimizeBusUtilization();
     }
 
     public Command run() {
