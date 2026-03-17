@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CommandTurret;
+import frc.robot.subsystems.CommandClimb;
 import frc.robot.subsystems.CommandIntake;
 
 public class RobotContainer {
@@ -36,6 +37,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
     public final CommandTurret turret = new CommandTurret(drivetrain);
+    public final CommandClimb climb = new CommandClimb();
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
@@ -58,22 +60,16 @@ public class RobotContainer {
             )
         );
 
-        intake.setDefaultCommand(intake.idle());
-        joystick.b().whileTrue(intake.run());
-        joystick.rightBumper().onTrue(intake.togglePivot());
-
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.b().onTrue(intake.toggleIntake());
 
-        turret.setDefaultCommand(turret.idle());
-        joystick.pov(90).whileTrue(turret.shooterTest(0.25));   // right
-        joystick.pov(0).whileTrue(turret.shooterTest(0.5));     // up
-        joystick.pov(270).whileTrue(turret.shooterTest(0.75));  // left
-        joystick.pov(180).whileTrue(turret.shooterTest(1.0));   // down
+        joystick.a().onTrue(turret.toggleShoot());
+
+        joystick.x().onTrue(climb.toggleClimb());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

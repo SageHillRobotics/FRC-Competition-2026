@@ -9,11 +9,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
+
+import java.util.Set;
 
 public class CommandTurret extends SubsystemBase {
     private CommandSwerveDrivetrain drivetrain;
@@ -27,6 +30,11 @@ public class CommandTurret extends SubsystemBase {
         shooterPositionMap.put(1.0, 1.0); //! TODO: Populate shooterPositionMap
     }
 
+    private static final Set<Integer> blueHubTags = Set.of(2, 3, 4, 5, 8, 9, 10, 11);
+    private static final Set<Integer> redHubTags  = Set.of(18, 19, 20, 21, 24, 25, 26, 27);
+
+    private static final double hoodDownPosition = 0; //! TODO: Tune hoodDownPosition
+
     private TalonFX turretMotor = new TalonFX(18);
     private SparkMax tunnelMotor = new SparkMax(19, SparkMax.MotorType.kBrushless);
     private TalonFX shooterMotorLeft = new TalonFX(22);
@@ -37,6 +45,7 @@ public class CommandTurret extends SubsystemBase {
     private PIDController hoodPID = new PIDController(0.1, 0, 0); //! TODO: Tune hoodPID
 
     private double targetDistance = 0;
+    private boolean isShootingActive = false;
 
     public CommandTurret(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -49,52 +58,46 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.getConfigurator().apply(config);
     }
 
-    public Command run() {
-        return Commands.run(() -> {
-            tunnelMotor.set(1); //! TODO: Tune tunnelMotor direction
-            shooterMotorLeft.set(shooterPositionMap.get(targetDistance));
-            shooterMotorRight.set(-shooterPositionMap.get(targetDistance));
-        }, this);
-    }
-
-    public Command idle() {
-        return Commands.run(() -> {
-            tunnelMotor.set(0);
-            shooterMotorLeft.set(0);
-            shooterMotorRight.set(0);
-        }, this);
-    }
-
-    public Command shooterTest(double speed) {
-        return Commands.run(() -> {
-            shooterMotorLeft.set(speed);
-            shooterMotorRight.set(-speed);
-        }, this);
+    public Command toggleShoot() {
+        return Commands.runOnce(() -> {
+            isShootingActive = !isShootingActive;
+        });
     }
 
     @Override
     public void periodic() {
         super.periodic();
 
-        poseEstimate();
-        trackTarget();
-
-        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 10 : 26).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
-        hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
-    }
-
-    public void poseEstimate() {
         LimelightHelpers.SetRobotOrientation("limelight", drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
         PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        drivetrain.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
-    }
+        if (poseEstimate != null && poseEstimate.tagCount > 0) {
+            drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            drivetrain.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+        }
 
-    public void trackTarget() {
-        if (LimelightHelpers.getFiducialID("limelight") == 10 || LimelightHelpers.getFiducialID("limelight") == 26) {
+        if (isShootingActive && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
         } else {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getIMUData("limelight").Yaw, drivetrain.getPigeon2().getRotation2d().getDegrees()));
         }
+
+        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 10 : 26).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
+
+        if (isShootingActive) {
+            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
+            tunnelMotor.set(1);
+            shooterMotorLeft.set(shooterPositionMap.get(targetDistance));
+            shooterMotorRight.set(-shooterPositionMap.get(targetDistance));
+        } else {
+            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodDownPosition));
+            tunnelMotor.set(0);
+            shooterMotorLeft.set(0);
+            shooterMotorRight.set(0);
+        }
+
+        SmartDashboard.putNumber("Turret Position", turretMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Position", hoodMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Shooter Speed", shooterMotorLeft.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Target Distance", targetDistance);
     }
 }
