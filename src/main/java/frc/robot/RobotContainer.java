@@ -8,10 +8,12 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -47,7 +49,16 @@ public class RobotContainer {
         drivetrain
     );
 
+    private AutoChooser autoChooser = new AutoChooser();
+
     public RobotContainer() {
+        autoChooser.addCmd("Simple 5m Square", this::simple5msquareAuto);
+        autoChooser.addCmd("Simple 5m Relay", this::simple5mrelayAuto);
+        autoChooser.addCmd("Subsystem Tests", this::subsystemtestsAuto);
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
+
         configureBindings();
     }
 
@@ -75,9 +86,24 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+        return autoChooser.selectedCommand();
+    }
+
+    public Command simple5msquareAuto() {
         return Commands.sequence(
-            autoFactory.resetOdometry("simple_5m_square"),
             autoFactory.trajectoryCmd("simple_5m_square")
+        );
+    }
+
+    public Command simple5mrelayAuto() {
+        return Commands.sequence(
+            autoFactory.trajectoryCmd("simple_5m_relay")
+        );
+    }
+
+    public Command subsystemtestsAuto() {
+        return Commands.sequence(
+            autoFactory.trajectoryCmd("subsystem_tests")
         );
     }
 }
