@@ -32,6 +32,7 @@ public class CommandClimb extends SubsystemBase {
             climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), climbDownPosition));
         }
 
-        SmartDashboard.putNumber("Climb Position", climbMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putBoolean("Climb/Climb Up", isClimbUp);
+        SmartDashboard.putNumber("Climb/Climb Position", climbMotor.getPosition().getValueAsDouble());
     }
 }

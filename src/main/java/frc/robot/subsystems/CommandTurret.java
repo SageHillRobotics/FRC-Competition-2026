@@ -95,9 +95,10 @@ public class CommandTurret extends SubsystemBase {
             shooterMotorRight.set(0);
         }
 
-        SmartDashboard.putNumber("Turret Position", turretMotor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Hood Position", hoodMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("Shooter Speed", shooterMotorLeft.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("Target Distance", targetDistance);
+        SmartDashboard.putBoolean("Turret/Shooting", isShootingActive);
+        SmartDashboard.putNumber("Turret/Turret Position", turretMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Turret/Hood Position", hoodMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Turret/Shooter Speed", shooterMotorLeft.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Turret/Target Distance", targetDistance);
     }
 }
