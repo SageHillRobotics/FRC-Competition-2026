@@ -11,8 +11,8 @@ public class CommandIntake extends SubsystemBase {
     private static double pivotDownPosition = 4; //! TODO: Tune pivotDownPosition
     private static double pivotUpPosition = 0; //! TODO: Tune pivotUpPosition
 
-    private TalonFX intakeMotor = new TalonFX(13);
-    private TalonFX pivotMotor = new TalonFX(15);
+    private TalonFX intakeMotor = new TalonFX(4);
+    private TalonFX pivotMotor = new TalonFX(9);
 
     private PIDController pivotPID = new PIDController(0.1, 0, 0); //! TODO: Tune pivotPID
 

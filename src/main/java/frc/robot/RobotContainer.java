@@ -54,7 +54,6 @@ public class RobotContainer {
     public RobotContainer() {
         autoChooser.addCmd("Simple 5m Square", this::simple5msquareAuto);
         autoChooser.addCmd("Simple 5m Relay", this::simple5mrelayAuto);
-        autoChooser.addCmd("Subsystem Tests", this::subsystemtestsAuto);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -91,19 +90,15 @@ public class RobotContainer {
 
     public Command simple5msquareAuto() {
         return Commands.sequence(
+            autoFactory.resetOdometry("simple_5m_square"),
             autoFactory.trajectoryCmd("simple_5m_square")
         );
     }
 
     public Command simple5mrelayAuto() {
         return Commands.sequence(
+            autoFactory.resetOdometry("simple_5m_relay"),
             autoFactory.trajectoryCmd("simple_5m_relay")
-        );
-    }
-
-    public Command subsystemtestsAuto() {
-        return Commands.sequence(
-            autoFactory.trajectoryCmd("subsystem_tests")
         );
     }
 }

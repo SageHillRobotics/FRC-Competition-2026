@@ -30,12 +30,12 @@ public class CommandTurret extends SubsystemBase {
         shooterPositionMap.put(1.0, 1.0); //! TODO: Populate shooterPositionMap
     }
 
-    private static final Set<Integer> blueHubTags = Set.of(2, 3, 4, 5, 8, 9, 10, 11);
-    private static final Set<Integer> redHubTags  = Set.of(18, 19, 20, 21, 24, 25, 26, 27);
+    private static final Set<Integer> redHubTags = Set.of(2, 3, 4, 5, 8, 9, 10, 11);
+    private static final Set<Integer> blueHubTags  = Set.of(18, 19, 20, 21, 24, 25, 26, 27);
 
     private static final double hoodDownPosition = 0; //! TODO: Tune hoodDownPosition
 
-    private TalonFX turretMotor = new TalonFX(18);
+    private TalonFX turretMotor = new TalonFX(15);
     private SparkMax tunnelMotor = new SparkMax(19, SparkMax.MotorType.kBrushless);
     private TalonFX shooterMotorLeft = new TalonFX(22);
     private TalonFX shooterMotorRight = new TalonFX(20);
@@ -81,7 +81,7 @@ public class CommandTurret extends SubsystemBase {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getIMUData("limelight").Yaw, drivetrain.getPigeon2().getRotation2d().getDegrees()));
         }
 
-        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 10 : 26).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
+        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
 
         if (isShootingActive) {
             hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
