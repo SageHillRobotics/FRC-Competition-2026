@@ -205,9 +205,9 @@
           },
           {
             "title": "Auto Chooser",
-            "x": 512.0,
-            "y": 512.0,
-            "width": 384.0,
+            "x": 896.0,
+            "y": 640.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
