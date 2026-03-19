@@ -40,6 +40,7 @@ public class CommandTurret extends SubsystemBase {
     private TalonFX shooterMotorLeft = new TalonFX(22);
     private TalonFX shooterMotorRight = new TalonFX(20);
     private SparkMax hoodMotor = new SparkMax(21, SparkMax.MotorType.kBrushless);
+    private SparkMax indexerMotor = new SparkMax(5, SparkMax.MotorType.kBrushless);
 
     private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
     private PIDController hoodPID = new PIDController(0.1, 0, 0); //! TODO: Tune hoodPID
@@ -88,11 +89,13 @@ public class CommandTurret extends SubsystemBase {
             tunnelMotor.set(1);
             shooterMotorLeft.set(shooterPositionMap.get(targetDistance));
             shooterMotorRight.set(-shooterPositionMap.get(targetDistance));
+            indexerMotor.set(1);
         } else {
             hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodDownPosition));
             tunnelMotor.set(0);
             shooterMotorLeft.set(0);
             shooterMotorRight.set(0);
+            indexerMotor.set(0);
         }
 
         SmartDashboard.putBoolean("Turret/Shooting", isShootingActive);
