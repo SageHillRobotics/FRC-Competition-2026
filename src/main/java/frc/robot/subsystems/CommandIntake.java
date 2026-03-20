@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CommandIntake extends SubsystemBase {
-    private static double pivotDownPosition = 4; //! TODO: Tune pivotDownPosition
-    private static double pivotUpPosition = 0; //! TODO: Tune pivotUpPosition
+    private static double pivotDownPosition = 2; //! TODO: Tune pivotDownPosition
+    private static double pivotUpPosition = 1; //! TODO: Tune pivotUpPosition
 
     private TalonFX intakeMotor = new TalonFX(4);
     private TalonFX pivotMotor = new TalonFX(9);
 
-    private PIDController pivotPID = new PIDController(0.1, 0, 0); //! TODO: Tune pivotPID
+    private PIDController pivotPID = new PIDController(0.05, 0, 0); //! TODO: Tune pivotPID
 
     private boolean isIntaking = false;
 
