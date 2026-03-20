@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CommandIntake extends SubsystemBase {
-    private static double pivotDownPosition = 2; //! TODO: Tune pivotDownPosition
+    private static double pivotDownPosition = 11.8; //! TODO: Tune pivotDownPosition
     private static double pivotUpPosition = 1; //! TODO: Tune pivotUpPosition
 
     private TalonFX intakeMotor = new TalonFX(4);
