@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
@@ -57,6 +58,11 @@ public class CommandTurret extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -turretLimitRotations;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         turretMotor.getConfigurator().apply(config);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), shooterMotorLeft.getVelocity());
+        turretMotor.optimizeBusUtilization();
+        shooterMotorLeft.optimizeBusUtilization();
+        shooterMotorRight.optimizeBusUtilization();
     }
 
     public Command toggleShoot() {

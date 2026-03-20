@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -17,6 +18,11 @@ public class CommandClimb extends SubsystemBase {
     private PIDController climbPID = new PIDController(0.1, 0, 0); //! TODO: Tune climbPID
 
     private boolean isClimbUp = false;
+
+    public CommandClimb() {
+        BaseStatusSignal.setUpdateFrequencyForAll(50, climbMotor.getPosition());
+        climbMotor.optimizeBusUtilization();
+    }
 
     public Command toggleClimb() {
         return Commands.runOnce(() -> {
