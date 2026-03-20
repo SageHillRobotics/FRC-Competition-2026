@@ -3,9 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -65,15 +63,6 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.optimizeBusUtilization();
         shooterMotorLeft.optimizeBusUtilization();
         shooterMotorRight.optimizeBusUtilization();
-
-        SparkMaxConfig noFeedback = new SparkMaxConfig();
-        noFeedback.signals.primaryEncoderPositionPeriodMs(500).primaryEncoderVelocityPeriodMs(500);
-        tunnelMotor.configure(noFeedback, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters);
-        indexerMotor.configure(noFeedback, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters);
-
-        SparkMaxConfig hoodConfig = new SparkMaxConfig();
-        hoodConfig.signals.primaryEncoderPositionPeriodMs(20).primaryEncoderVelocityPeriodMs(500);
-        hoodMotor.configure(hoodConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters);
     }
 
     public Command toggleShoot() {
