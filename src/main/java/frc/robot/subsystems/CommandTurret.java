@@ -3,7 +3,11 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -34,7 +38,7 @@ public class CommandTurret extends SubsystemBase {
     private static final Set<Integer> redHubTags = Set.of(2, 3, 4, 5, 8, 9, 10, 11);
     private static final Set<Integer> blueHubTags  = Set.of(18, 19, 20, 21, 24, 25, 26, 27);
 
-    private static final double hoodDownPosition = 0; //! TODO: Tune hoodDownPosition
+    private static final double hoodDownPosition = 0;
 
     private TalonFX turretMotor = new TalonFX(15);
     private SparkMax tunnelMotor = new SparkMax(19, SparkMax.MotorType.kBrushless);
@@ -44,7 +48,7 @@ public class CommandTurret extends SubsystemBase {
     private SparkMax indexerMotor = new SparkMax(5, SparkMax.MotorType.kBrushless);
 
     private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
-    private PIDController hoodPID = new PIDController(0.1, 0, 0); //! TODO: Tune hoodPID
+    private PIDController hoodPID = new PIDController(0.5, 0, 0); //! TODO: Tune hoodPID
 
     private double targetDistance = 0;
     private boolean isShootingActive = false;
@@ -63,6 +67,27 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.optimizeBusUtilization();
         shooterMotorLeft.optimizeBusUtilization();
         shooterMotorRight.optimizeBusUtilization();
+
+        SparkMaxConfig hoodConfig = new SparkMaxConfig();
+        hoodConfig.idleMode(IdleMode.kBrake).signals
+            .primaryEncoderPositionPeriodMs(20)
+            .primaryEncoderVelocityPeriodMs(500)
+            .appliedOutputPeriodMs(500)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(500);
+        hoodMotor.configure(hoodConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        SparkMaxConfig noFeedbackConfig = new SparkMaxConfig();
+        noFeedbackConfig.signals
+            .primaryEncoderPositionPeriodMs(500)
+            .primaryEncoderVelocityPeriodMs(500)
+            .appliedOutputPeriodMs(500)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(500);
+        tunnelMotor.configure(noFeedbackConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        indexerMotor.configure(noFeedbackConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
         SmartDashboard.putBoolean("Turret/Tune", false);
         SmartDashboard.putNumber("Turret/Tune Hood Position", 0);
