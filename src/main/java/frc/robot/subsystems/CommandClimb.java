@@ -21,13 +21,6 @@ public class CommandClimb extends SubsystemBase {
     private boolean isClimbUp = false;
 
     public CommandClimb() {
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.CurrentLimits.SupplyCurrentLimit = 40; //! TODO: Tune supply current limit
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 60; //! TODO: Tune stator current limit
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        climbMotor.getConfigurator().apply(config);
-
         BaseStatusSignal.setUpdateFrequencyForAll(50, climbMotor.getPosition());
         climbMotor.optimizeBusUtilization();
     }

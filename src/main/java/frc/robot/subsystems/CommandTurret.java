@@ -59,15 +59,6 @@ public class CommandTurret extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         turretMotor.getConfigurator().apply(config);
 
-        TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
-        shooterConfig.CurrentLimits.SupplyCurrentLimit = 40; //! TODO: Tune supply current limit
-        shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        shooterConfig.CurrentLimits.StatorCurrentLimit = 80; //! TODO: Tune stator current limit
-        shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        shooterConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.5; //! TODO: Tune ramp period
-        shooterMotorLeft.getConfigurator().apply(shooterConfig);
-        shooterMotorRight.getConfigurator().apply(shooterConfig);
-
         BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), shooterMotorLeft.getVelocity());
         turretMotor.optimizeBusUtilization();
         shooterMotorLeft.optimizeBusUtilization();
