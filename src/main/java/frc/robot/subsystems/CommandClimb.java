@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -23,6 +22,9 @@ public class CommandClimb extends SubsystemBase {
     public CommandClimb() {
         BaseStatusSignal.setUpdateFrequencyForAll(50, climbMotor.getPosition());
         climbMotor.optimizeBusUtilization();
+
+        SmartDashboard.putBoolean("Climb/Tune", false);
+        SmartDashboard.putNumber("Climb/Tune Position", 0);
     }
 
     public Command toggleClimb() {
@@ -33,7 +35,11 @@ public class CommandClimb extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (isClimbUp) {
+        boolean tuning = SmartDashboard.getBoolean("Climb/Tune", false);
+        if (tuning) {
+            double tunePos = SmartDashboard.getNumber("Climb/Tune Climb Position", 0);
+            climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), tunePos));
+        } else if (isClimbUp) {
             climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), climbUpPosition));
         } else {
             climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), climbDownPosition));

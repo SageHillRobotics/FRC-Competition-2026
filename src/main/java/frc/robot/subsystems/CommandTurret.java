@@ -63,6 +63,10 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.optimizeBusUtilization();
         shooterMotorLeft.optimizeBusUtilization();
         shooterMotorRight.optimizeBusUtilization();
+
+        SmartDashboard.putBoolean("Turret/Tune", false);
+        SmartDashboard.putNumber("Turret/Tune Hood Position", 0);
+        SmartDashboard.putNumber("Turret/Tune Shooter Speed", 0);
     }
 
     public Command toggleShoot() {
@@ -90,7 +94,16 @@ public class CommandTurret extends SubsystemBase {
 
         targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
 
-        if (isShootingActive) {
+        boolean tuning = SmartDashboard.getBoolean("Turret/Tune", false);
+        if (tuning) {
+            double tuneHood = SmartDashboard.getNumber("Turret/Tune Hood Position", 0);
+            double tuneSpeed = SmartDashboard.getNumber("Turret/Tune Shooter Speed", 0);
+            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), tuneHood));
+            tunnelMotor.set(0);
+            shooterMotorLeft.set(tuneSpeed);
+            shooterMotorRight.set(-tuneSpeed);
+            indexerMotor.set(0);
+        } else if (isShootingActive) {
             hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
             tunnelMotor.set(1);
             shooterMotorLeft.set(shooterPositionMap.get(targetDistance));
