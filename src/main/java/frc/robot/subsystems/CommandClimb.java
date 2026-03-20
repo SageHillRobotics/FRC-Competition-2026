@@ -14,7 +14,7 @@ public class CommandClimb extends SubsystemBase {
     private static double climbUpPosition = 26.9; //! TODO: Tune climbUpPosition
     
     private TalonFX climbMotor = new TalonFX(11);
-    `
+    
     private PIDController climbPID = new PIDController(0.1, 0, 0); //! TODO: Tune climbPID
 
     private boolean isClimbUp = false;
