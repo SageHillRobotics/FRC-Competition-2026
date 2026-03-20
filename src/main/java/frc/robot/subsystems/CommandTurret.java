@@ -79,7 +79,7 @@ public class CommandTurret extends SubsystemBase {
         if (isShootingActive && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
         } else {
-            turretMotor.set(turretPID.calculate(LimelightHelpers.getIMUData("limelight").Yaw, drivetrain.getPigeon2().getRotation2d().getDegrees()));
+            turretMotor.set(turretPID.calculate(turretMotor.getPosition().getValueAsDouble(), 0));
         }
 
         targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
