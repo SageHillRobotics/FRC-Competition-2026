@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,6 +21,20 @@ public class CommandIntake extends SubsystemBase {
     private boolean isIntaking = false;
 
     public CommandIntake() {
+        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 40; //! TODO: Tune supply current limit
+        intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 60; //! TODO: Tune stator current limit
+        intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        intakeMotor.getConfigurator().apply(intakeConfig);
+
+        TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
+        pivotConfig.CurrentLimits.SupplyCurrentLimit = 20; //! TODO: Tune supply current limit
+        pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        pivotConfig.CurrentLimits.StatorCurrentLimit = 40; //! TODO: Tune stator current limit
+        pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        pivotMotor.getConfigurator().apply(pivotConfig);
+
         BaseStatusSignal.setUpdateFrequencyForAll(50, pivotMotor.getPosition());
         intakeMotor.optimizeBusUtilization();
         pivotMotor.optimizeBusUtilization();
