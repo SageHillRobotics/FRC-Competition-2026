@@ -43,7 +43,7 @@ public class CommandIntake extends SubsystemBase {
             intakeMotor.set(0);
         } else if (isIntaking) {
             pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
-            intakeMotor.set(1);
+            intakeMotor.set(-1);
         } else {
             pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotUpPosition));
             intakeMotor.set(0);
