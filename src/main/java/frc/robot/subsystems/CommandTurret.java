@@ -48,7 +48,7 @@ public class CommandTurret extends SubsystemBase {
     private SparkMax indexerMotor = new SparkMax(5, SparkMax.MotorType.kBrushless);
 
     private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
-    private PIDController hoodPID = new PIDController(0.5, 0, 0); //! TODO: Tune hoodPID
+    private PIDController hoodPID = new PIDController(0.15, 0, 0.02); //! TODO: Tune hoodPID
 
     private double targetDistance = 0;
     private boolean isShootingActive = false;
@@ -76,7 +76,7 @@ public class CommandTurret extends SubsystemBase {
             .busVoltagePeriodMs(500)
             .outputCurrentPeriodMs(500)
             .motorTemperaturePeriodMs(500);
-        hoodMotor.configure(hoodConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         SparkMaxConfig noFeedbackConfig = new SparkMaxConfig();
         noFeedbackConfig.signals
@@ -86,8 +86,8 @@ public class CommandTurret extends SubsystemBase {
             .busVoltagePeriodMs(500)
             .outputCurrentPeriodMs(500)
             .motorTemperaturePeriodMs(500);
-        tunnelMotor.configure(noFeedbackConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        indexerMotor.configure(noFeedbackConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        tunnelMotor.configure(noFeedbackConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        indexerMotor.configure(noFeedbackConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         SmartDashboard.putBoolean("Turret/Tune", false);
         SmartDashboard.putNumber("Turret/Tune Hood Position", 0);
