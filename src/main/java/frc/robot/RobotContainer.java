@@ -102,4 +102,13 @@ public class RobotContainer {
             autoFactory.trajectoryCmd("simple_5m_relay")
         );
     }
+
+    public Command climbAuto() {
+        return Commands.sequence(
+            autoFactory.resetOdometry("auto_climb"),
+            climb.toggleClimbPartial(),
+            autoFactory.trajectoryCmd("auto_climb"),
+            climb.toggleClimbPartial()
+        );
+    }
 }
