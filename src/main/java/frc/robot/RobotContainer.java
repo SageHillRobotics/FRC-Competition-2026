@@ -52,8 +52,7 @@ public class RobotContainer {
     private AutoChooser autoChooser = new AutoChooser();
 
     public RobotContainer() {
-        autoChooser.addCmd("Simple 5m Square", this::simple5msquareAuto);
-        autoChooser.addCmd("Simple 5m Relay", this::simple5mrelayAuto);
+        autoChooser.addCmd("Climb", this::climbAuto);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
