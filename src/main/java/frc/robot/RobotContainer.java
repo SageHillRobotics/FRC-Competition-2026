@@ -73,7 +73,6 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
         joystick.b().onTrue(intake.toggleIntake());
 
         joystick.a().onTrue(turret.toggleShoot());
@@ -85,7 +84,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
+        // return autoChooser.selectedCommand();
+        return climbAuto();
     }
 
     public Command climbAuto() {
