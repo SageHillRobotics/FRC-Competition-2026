@@ -80,6 +80,7 @@ public class RobotContainer {
         joystick.a().onTrue(turret.toggleShoot());
 
         joystick.x().onTrue(climb.toggleClimb());
+        joystick.y().onTrue(climb.toggleClimbPartial());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

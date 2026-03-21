@@ -10,14 +10,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CommandClimb extends SubsystemBase {
-    private static double climbDownPosition = 0;
-    private static double climbUpPosition = 26.9;
-    
+    private static final double climbDownPosition = 0;
+    private static final double climbPartialDownPosition = 1;
+    private static final double climbUpPosition = 26.9;
+
     private TalonFX climbMotor = new TalonFX(11);
-    
+
     private PIDController climbPID = new PIDController(0.05, 0, 0);
 
     private boolean isClimbUp = false;
+    private double activeDownPosition = climbDownPosition;
 
     public CommandClimb() {
         BaseStatusSignal.setUpdateFrequencyForAll(50, climbMotor.getPosition());
@@ -29,6 +31,14 @@ public class CommandClimb extends SubsystemBase {
 
     public Command toggleClimb() {
         return Commands.runOnce(() -> {
+            activeDownPosition = climbDownPosition;
+            isClimbUp = !isClimbUp;
+        });
+    }
+
+    public Command toggleClimbPartial() {
+        return Commands.runOnce(() -> {
+            activeDownPosition = climbPartialDownPosition;
             isClimbUp = !isClimbUp;
         });
     }
@@ -42,7 +52,7 @@ public class CommandClimb extends SubsystemBase {
         } else if (isClimbUp) {
             climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), climbUpPosition));
         } else {
-            climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), climbDownPosition));
+            climbMotor.set(climbPID.calculate(climbMotor.getPosition().getValueAsDouble(), activeDownPosition));
         }
 
         SmartDashboard.putBoolean("Climb/Climb Up", isClimbUp);
