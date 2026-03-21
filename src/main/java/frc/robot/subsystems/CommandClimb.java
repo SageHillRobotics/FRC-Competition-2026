@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class CommandClimb extends SubsystemBase {
     private static final double climbDownPosition = 0;
     private static final double climbPartialDownPosition = 1;
-    private static final double climbUpPosition = 26.9;
+    private static final double climbUpPosition = 58;
 
     private TalonFX climbMotor = new TalonFX(11);
 

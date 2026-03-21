@@ -27,7 +27,7 @@ public class CommandTurret extends SubsystemBase {
     private CommandSwerveDrivetrain drivetrain;
 
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
-    private static final double turretLimitRotations = 1; //! TODO: Tune turretLimitRotations
+    private static final double turretLimitRotations = 11; //! TODO: Tune turretLimitRotations
     private static final InterpolatingDoubleTreeMap hoodPositionMap = new InterpolatingDoubleTreeMap();
     private static final InterpolatingDoubleTreeMap shooterPositionMap = new InterpolatingDoubleTreeMap();
     static {

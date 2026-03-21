@@ -88,20 +88,6 @@ public class RobotContainer {
         return autoChooser.selectedCommand();
     }
 
-    public Command simple5msquareAuto() {
-        return Commands.sequence(
-            autoFactory.resetOdometry("simple_5m_square"),
-            autoFactory.trajectoryCmd("simple_5m_square")
-        );
-    }
-
-    public Command simple5mrelayAuto() {
-        return Commands.sequence(
-            autoFactory.resetOdometry("simple_5m_relay"),
-            autoFactory.trajectoryCmd("simple_5m_relay")
-        );
-    }
-
     public Command climbAuto() {
         return Commands.sequence(
             autoFactory.resetOdometry("auto_climb"),
