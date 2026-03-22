@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CommandClimb extends SubsystemBase {
     private static final double climbDownPosition = 0;
-    private static final double climbPartialDownPosition = 1;
-    private static final double climbUpPosition = 58;
+    private static final double climbPartialDownPosition = 55;
+    private static final double climbUpPosition = 192.9;
 
     private TalonFX climbMotor = new TalonFX(11);
 
-    private PIDController climbPID = new PIDController(0.05, 0, 0);
+    private PIDController climbPID = new PIDController(0.1, 0, 0);
 
     private boolean isClimbUp = false;
     private double activeDownPosition = climbDownPosition;
