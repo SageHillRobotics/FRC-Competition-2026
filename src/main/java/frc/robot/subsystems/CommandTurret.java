@@ -1,13 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -25,6 +21,7 @@ import java.util.Set;
 
 public class CommandTurret extends SubsystemBase {
     private CommandSwerveDrivetrain drivetrain;
+    private SwerveRequest.FieldCentric drive;
 
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     private static final double turretLimitRotations = 11; //! TODO: Tune turretLimitRotations
@@ -47,14 +44,15 @@ public class CommandTurret extends SubsystemBase {
     private SparkMax hoodMotor = new SparkMax(21, SparkMax.MotorType.kBrushless);
     private SparkMax indexerMotor = new SparkMax(5, SparkMax.MotorType.kBrushless);
 
-    private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
-    private PIDController hoodPID = new PIDController(0.15, 0, 0.02); //! TODO: Tune hoodPID
+    private PIDController turretPID = new PIDController(0.5, 0, 0); //! TODO: Tune turretPID
+    private PIDController hoodPID = new PIDController(0.1, 0, 0); //! TODO: Tune hoodPID
 
     private double targetDistance = 0;
     private boolean isShootingActive = false;
 
-    public CommandTurret(CommandSwerveDrivetrain drivetrain) {
+    public CommandTurret(CommandSwerveDrivetrain drivetrain, SwerveRequest.FieldCentric drive) {
         this.drivetrain = drivetrain;
+        this.drive = drive;
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = turretLimitRotations;
@@ -62,36 +60,6 @@ public class CommandTurret extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -turretLimitRotations;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         turretMotor.getConfigurator().apply(config);
-
-        BaseStatusSignal.setUpdateFrequencyForAll(50, turretMotor.getPosition(), shooterMotorLeft.getVelocity());
-        turretMotor.optimizeBusUtilization();
-        shooterMotorLeft.optimizeBusUtilization();
-        shooterMotorRight.optimizeBusUtilization();
-
-        SparkMaxConfig hoodConfig = new SparkMaxConfig();
-        hoodConfig.idleMode(IdleMode.kBrake).signals
-            .primaryEncoderPositionPeriodMs(20)
-            .primaryEncoderVelocityPeriodMs(500)
-            .appliedOutputPeriodMs(500)
-            .busVoltagePeriodMs(500)
-            .outputCurrentPeriodMs(500)
-            .motorTemperaturePeriodMs(500);
-        hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-        SparkMaxConfig noFeedbackConfig = new SparkMaxConfig();
-        noFeedbackConfig.signals
-            .primaryEncoderPositionPeriodMs(500)
-            .primaryEncoderVelocityPeriodMs(500)
-            .appliedOutputPeriodMs(500)
-            .busVoltagePeriodMs(500)
-            .outputCurrentPeriodMs(500)
-            .motorTemperaturePeriodMs(500);
-        tunnelMotor.configure(noFeedbackConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        indexerMotor.configure(noFeedbackConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-        SmartDashboard.putBoolean("Turret/Tune", false);
-        SmartDashboard.putNumber("Turret/Tune Hood Position", 0);
-        SmartDashboard.putNumber("Turret/Tune Shooter Speed", 0);
     }
 
     public Command toggleShoot() {
@@ -112,30 +80,22 @@ public class CommandTurret extends SubsystemBase {
         }
 
         if (isShootingActive && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
-            turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
+            // turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
+            drivetrain.setControl(drive.withRotationalRate(turretPID.calculate(LimelightHelpers.getTX("limelight"))));
         } else {
-            turretMotor.set(turretPID.calculate(turretMotor.getPosition().getValueAsDouble(), 0));
+            // turretMotor.set(turretPID.calculate(turretMotor.getPosition().getValueAsDouble(), 0));
         }
 
         targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
 
-        boolean tuning = SmartDashboard.getBoolean("Turret/Tune", false);
-        if (tuning) {
-            double tuneHood = SmartDashboard.getNumber("Turret/Tune Hood Position", 0);
-            double tuneSpeed = SmartDashboard.getNumber("Turret/Tune Shooter Speed", 0);
-            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), tuneHood));
-            tunnelMotor.set(0);
-            shooterMotorLeft.set(tuneSpeed);
-            shooterMotorRight.set(-tuneSpeed);
-            indexerMotor.set(0);
-        } else if (isShootingActive) {
-            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
+        if (isShootingActive) {
+            // hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodPositionMap.get(targetDistance)));
             tunnelMotor.set(1);
             shooterMotorLeft.set(shooterPositionMap.get(targetDistance));
             shooterMotorRight.set(-shooterPositionMap.get(targetDistance));
             indexerMotor.set(1);
         } else {
-            hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodDownPosition));
+            // hoodMotor.set(hoodPID.calculate(hoodMotor.getEncoder().getPosition(), hoodDownPosition));
             tunnelMotor.set(0);
             shooterMotorLeft.set(0);
             shooterMotorRight.set(0);

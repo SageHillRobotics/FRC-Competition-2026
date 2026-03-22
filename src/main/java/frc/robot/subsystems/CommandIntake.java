@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,12 +19,6 @@ public class CommandIntake extends SubsystemBase {
     private boolean isIntaking = false;
 
     public CommandIntake() {
-        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotMotor.getPosition());
-        intakeMotor.optimizeBusUtilization();
-        pivotMotor.optimizeBusUtilization();
-
-        SmartDashboard.putBoolean("Intake/Tune", false);
-        SmartDashboard.putNumber("Intake/Tune Pivot Position", 0);
     }
 
     public Command toggleIntake() {
@@ -36,12 +29,7 @@ public class CommandIntake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        boolean tuning = SmartDashboard.getBoolean("Intake/Tune", false);
-        if (tuning) {
-            double tunePos = SmartDashboard.getNumber("Intake/Tune Pivot Position", 0);
-            pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), tunePos));
-            intakeMotor.set(0);
-        } else if (isIntaking) {
+        if (isIntaking) {
             pivotMotor.set(pivotPID.calculate(pivotMotor.getPosition().getValueAsDouble(), pivotDownPosition));
             intakeMotor.set(-1);
         } else {

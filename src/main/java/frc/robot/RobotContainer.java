@@ -28,7 +28,7 @@ public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
@@ -38,7 +38,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
-    public final CommandTurret turret = new CommandTurret(drivetrain);
+    public final CommandTurret turret = new CommandTurret(drivetrain, drive);
     public final CommandClimb climb = new CommandClimb();
 
     private AutoFactory autoFactory = new AutoFactory(
@@ -84,8 +84,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // return autoChooser.selectedCommand();
-        return climbAuto();
+        return autoChooser.selectedCommand();
+        // return climbAuto();
     }
 
     public Command climbAuto() {
