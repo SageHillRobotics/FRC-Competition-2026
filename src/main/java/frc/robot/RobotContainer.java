@@ -15,13 +15,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CommandTurret;
-import frc.robot.subsystems.CommandClimb;
 import frc.robot.subsystems.CommandIntake;
 
 public class RobotContainer {
@@ -39,7 +37,6 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
     public final CommandTurret turret = new CommandTurret(drivetrain, drive);
-    public final CommandClimb climb = new CommandClimb();
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
@@ -52,8 +49,6 @@ public class RobotContainer {
     private AutoChooser autoChooser = new AutoChooser();
 
     public RobotContainer() {
-        autoChooser.addCmd("Climb", this::climbAuto);
-
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
@@ -77,23 +72,10 @@ public class RobotContainer {
 
         joystick.a().onTrue(turret.toggleShoot());
 
-        joystick.x().onTrue(climb.toggleClimb());
-        joystick.y().onTrue(climb.toggleClimbPartial());
-
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     public Command getAutonomousCommand() {
         return autoChooser.selectedCommand();
-        // return climbAuto();
-    }
-
-    public Command climbAuto() {
-        return Commands.sequence(
-            autoFactory.resetOdometry("auto_climb"),
-            climb.toggleClimbPartial(),
-            autoFactory.trajectoryCmd("auto_climb"),
-            climb.toggleClimbPartial()
-        );
     }
 }
