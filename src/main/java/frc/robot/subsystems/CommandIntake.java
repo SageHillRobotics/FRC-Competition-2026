@@ -38,6 +38,5 @@ public class CommandIntake extends SubsystemBase {
         }
 
         SmartDashboard.putBoolean("Intake/Intaking", isIntaking);
-        SmartDashboard.putNumber("Intake/Pivot Position", pivotMotor.getPosition().getValueAsDouble());
     }
 }

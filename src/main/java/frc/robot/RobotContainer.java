@@ -36,7 +36,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
-    public final CommandTurret turret = new CommandTurret(drivetrain, drive);
+    public final CommandTurret turret = new CommandTurret(drivetrain);
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
