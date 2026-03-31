@@ -15,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
@@ -49,6 +50,9 @@ public class RobotContainer {
     private AutoChooser autoChooser = new AutoChooser();
 
     public RobotContainer() {
+        autoChooser.addCmd("Intake and Shoot", this::shootAuto);
+        autoChooser.addCmd("Shoot Preload", this::shootPreloadAuto);
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
@@ -77,5 +81,25 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoChooser.selectedCommand();
+    }
+
+    public Command shootAuto() {
+        return Commands.sequence(
+            autoFactory.resetOdometry("shoot1"),
+            autoFactory.trajectoryCmd("shoot1"),
+            intake.toggleIntake(),
+            autoFactory.trajectoryCmd("shoot2"),
+            intake.toggleIntake(),
+            autoFactory.trajectoryCmd("shoot3"),
+            turret.toggleShoot()
+        );
+    }
+
+    public Command shootPreloadAuto() {
+        return Commands.sequence(
+            autoFactory.resetOdometry("shoot4"),
+            autoFactory.trajectoryCmd("shoot4"),
+            turret.toggleShoot()
+        );
     }
 }
