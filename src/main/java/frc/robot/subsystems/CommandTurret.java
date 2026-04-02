@@ -23,6 +23,8 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import java.util.Set;
 
 public class CommandTurret extends SubsystemBase {
+    private enum Mode { IDLE, SHOOTING, MANUAL, ANTISTUCK }
+
     private CommandSwerveDrivetrain drivetrain;
     private CommandXboxController joystick;
 
@@ -43,11 +45,8 @@ public class CommandTurret extends SubsystemBase {
 
     private PIDController turretPID = new PIDController(0.5, 0, 0); //! TODO: Tune turretPID
 
+    private Mode currentMode = Mode.IDLE;
     private double targetDistance = 0;
-    private boolean isShootingActive = false;
-    private boolean isAntistuckActive = false;
-    private boolean isManualActive = false;
-
     private Timer timer = new Timer();
 
     public CommandTurret(CommandSwerveDrivetrain drivetrain, CommandXboxController joystick) {
@@ -62,31 +61,26 @@ public class CommandTurret extends SubsystemBase {
         turretMotor.getConfigurator().apply(config);
     }
 
-    public Command toggleShoot() {
+    private Command setMode(Mode mode) {
         return Commands.runOnce(() -> {
-            isShootingActive = !isShootingActive;
-            isAntistuckActive = false;
-            isManualActive = false;
+            currentMode = (currentMode == mode) ? Mode.IDLE : mode;
             timer.restart();
         }, this);
     }
 
-    public Command toggleManual() {
-        return Commands.runOnce(() -> {
-            isManualActive = !isManualActive;
-            isAntistuckActive = false;
-            isShootingActive = false;
-            timer.restart();
-        }, this);
+    public Command toggleShoot()     { return setMode(Mode.SHOOTING);  }
+    public Command toggleManual()    { return setMode(Mode.MANUAL);    }
+    public Command toggleAntistuck() { return setMode(Mode.ANTISTUCK); }
+
+    private boolean isAllianceTagVisible() {
+        Set<Integer> hubTags = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags;
+        return hubTags.contains((int) LimelightHelpers.getFiducialID("limelight"));
     }
 
-    public Command toggleAntistuck() {
-        return Commands.runOnce(() -> {
-            isAntistuckActive = !isAntistuckActive;
-            isShootingActive = false;
-            isManualActive = false;
-            timer.restart();
-        }, this);
+    private double getTargetDistance() {
+        int tagId = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10;
+        return fieldLayout.getTagPose(tagId).get().getTranslation().toTranslation2d()
+            .getDistance(drivetrain.getState().Pose.getTranslation());
     }
 
     @Override
@@ -100,9 +94,9 @@ public class CommandTurret extends SubsystemBase {
             drivetrain.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
         }
 
-        if (isShootingActive && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
+        if (currentMode == Mode.SHOOTING && isAllianceTagVisible()) {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
-        } else if (isManualActive) {
+        } else if (currentMode == Mode.MANUAL) {
             if (joystick.leftBumper().getAsBoolean()) {
                 turretMotor.set(-1);
             } else if (joystick.rightBumper().getAsBoolean()) {
@@ -116,15 +110,15 @@ public class CommandTurret extends SubsystemBase {
             turretMotor.set(0);
         }
 
-        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
+        targetDistance = getTargetDistance();
 
-        if (isShootingActive || isManualActive) {
+        if (currentMode == Mode.SHOOTING || currentMode == Mode.MANUAL) {
             shooterMotor.set(shooterVelocityMap.get(targetDistance));
             if (timer.hasElapsed(0.5)) {
                 tunnelMotor.set(1);
                 indexerMotor.set(1);
             }
-        } else if (isAntistuckActive) {
+        } else if (currentMode == Mode.ANTISTUCK) {
             shooterMotor.set(-1);
             tunnelMotor.set(-1);
             indexerMotor.set(-1);
@@ -134,8 +128,8 @@ public class CommandTurret extends SubsystemBase {
             indexerMotor.set(0);
         }
 
-        SmartDashboard.putBoolean("Turret/Shooting", isShootingActive);
-        SmartDashboard.putBoolean("Turret/Manual Mode", isManualActive);
-        SmartDashboard.putBoolean("Turret/Jam Prevention", isAntistuckActive);
+        SmartDashboard.putBoolean("Turret/Shooting", currentMode == Mode.SHOOTING);
+        SmartDashboard.putBoolean("Turret/Manual Mode", currentMode == Mode.MANUAL);
+        SmartDashboard.putBoolean("Turret/Jam Prevention", currentMode == Mode.ANTISTUCK);
     }
 }
