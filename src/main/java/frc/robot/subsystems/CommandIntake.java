@@ -24,7 +24,7 @@ public class CommandIntake extends SubsystemBase {
     public Command toggleIntake() {
         return Commands.runOnce(() -> {
             isIntaking = !isIntaking;
-        });
+        }, this);
     }
 
     @Override
