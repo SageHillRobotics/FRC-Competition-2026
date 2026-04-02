@@ -98,7 +98,7 @@
             "title": "Intaking",
             "x": 640.0,
             "y": 32.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -113,9 +113,9 @@
           },
           {
             "title": "Shooting",
-            "x": 896.0,
+            "x": 768.0,
             "y": 32.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -137,6 +137,40 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/FMSInfo/IsRedAlliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Jam Prevention",
+            "x": 1024.0,
+            "y": 32.0,
+            "width": 128.0,
+            "height": 192.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Turret/Jam Prevention",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Manual Mode",
+            "x": 896.0,
+            "y": 32.0,
+            "width": 128.0,
+            "height": 192.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Turret/Manual Mode",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,

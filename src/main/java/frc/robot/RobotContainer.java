@@ -33,11 +33,11 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    public final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
-    public final CommandTurret turret = new CommandTurret(drivetrain);
+    public final CommandTurret turret = new CommandTurret(drivetrain, joystick);
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
@@ -74,9 +74,13 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-        joystick.b().onTrue(intake.toggleIntake());
+        joystick.leftTrigger().onTrue(intake.toggleIntake());
 
-        joystick.a().onTrue(turret.toggleShoot());
+        joystick.rightTrigger().onTrue(turret.toggleShoot());
+
+        joystick.a().onTrue(turret.toggleManual());
+
+        joystick.b().onTrue(turret.toggleAntistuck());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
