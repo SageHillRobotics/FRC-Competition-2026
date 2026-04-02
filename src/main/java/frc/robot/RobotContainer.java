@@ -50,7 +50,9 @@ public class RobotContainer {
     private AutoChooser autoChooser = new AutoChooser();
 
     public RobotContainer() {
-        autoChooser.addCmd("Intake and Shoot", this::shootAuto);
+        autoChooser.addCmd("Shoot Left", this::shootLeftAuto);
+        autoChooser.addCmd("Shoot Right", this::shootRightAuto);
+        autoChooser.addCmd("Shoot Depot", this::shootDepotAuto);
         autoChooser.addCmd("Shoot Preload", this::shootPreloadAuto);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -83,22 +85,45 @@ public class RobotContainer {
         return autoChooser.selectedCommand();
     }
 
-    public Command shootAuto() {
+    public Command shootLeftAuto() {
         return Commands.sequence(
-            autoFactory.resetOdometry("shoot1"),
-            autoFactory.trajectoryCmd("shoot1"),
+            autoFactory.resetOdometry("shootLeft1"),
+            autoFactory.trajectoryCmd("shootLeft1"),
             intake.toggleIntake(),
-            autoFactory.trajectoryCmd("shoot2"),
+            autoFactory.trajectoryCmd("shootLeft2"),
             intake.toggleIntake(),
-            autoFactory.trajectoryCmd("shoot3"),
+            autoFactory.trajectoryCmd("shootLeft3"),
+            turret.toggleShoot()
+        );
+    }
+
+    public Command shootRightAuto() {
+        return Commands.sequence(
+            autoFactory.resetOdometry("shootRight1"),
+            autoFactory.trajectoryCmd("shootRight1"),
+            intake.toggleIntake(),
+            autoFactory.trajectoryCmd("shootRight2"),
+            intake.toggleIntake(),
+            autoFactory.trajectoryCmd("shootRight3"),
             turret.toggleShoot()
         );
     }
 
     public Command shootPreloadAuto() {
         return Commands.sequence(
-            autoFactory.resetOdometry("shoot4"),
-            autoFactory.trajectoryCmd("shoot4"),
+            autoFactory.resetOdometry("shootPreload1"),
+            autoFactory.trajectoryCmd("shootPreload1"),
+            turret.toggleShoot()
+        );
+    }
+
+    public Command shootDepotAuto() {
+        return Commands.sequence(
+            autoFactory.resetOdometry("shootDepot1"),
+            autoFactory.trajectoryCmd("shootDepot1"),
+            intake.toggleIntake(),
+            autoFactory.trajectoryCmd("shootDepot2"),
+            intake.toggleIntake(),
             turret.toggleShoot()
         );
     }
