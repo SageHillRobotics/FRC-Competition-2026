@@ -23,7 +23,9 @@ import frc.robot.LimelightHelpers.PoseEstimate;
 import java.util.Set;
 
 public class CommandTurret extends SubsystemBase {
-    private enum Mode { IDLE, SHOOTING, MANUAL, ANTISTUCK }
+    private enum Mode {
+        IDLE, SHOOTING, MANUAL, ANTISTUCK
+    }
 
     private CommandSwerveDrivetrain drivetrain;
     private CommandXboxController joystick;
@@ -68,25 +70,21 @@ public class CommandTurret extends SubsystemBase {
         }, this);
     }
 
-    public Command toggleShoot()     { return setMode(Mode.SHOOTING);  }
-    public Command toggleManual()    { return setMode(Mode.MANUAL);    }
-    public Command toggleAntistuck() { return setMode(Mode.ANTISTUCK); }
-
-    private boolean isAllianceTagVisible() {
-        Set<Integer> hubTags = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags;
-        return hubTags.contains((int) LimelightHelpers.getFiducialID("limelight"));
+    public Command toggleShoot() {
+        return setMode(Mode.SHOOTING);
     }
-
-    private double getTargetDistance() {
-        int tagId = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10;
-        return fieldLayout.getTagPose(tagId).get().getTranslation().toTranslation2d()
-            .getDistance(drivetrain.getState().Pose.getTranslation());
+    public Command toggleManual() {
+        return setMode(Mode.MANUAL);
+    }
+    public Command toggleAntistuck() {
+        return setMode(Mode.ANTISTUCK);
     }
 
     @Override
     public void periodic() {
         super.periodic();
 
+        // Limelight Odometry
         LimelightHelpers.SetRobotOrientation("limelight", drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
         PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
         if (poseEstimate != null && poseEstimate.tagCount > 0) {
@@ -94,7 +92,8 @@ public class CommandTurret extends SubsystemBase {
             drivetrain.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
         }
 
-        if (currentMode == Mode.SHOOTING && isAllianceTagVisible()) {
+        // Turret Rotation
+        if (currentMode == Mode.SHOOTING && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
         } else if (currentMode == Mode.MANUAL) {
             if (joystick.leftBumper().getAsBoolean()) {
@@ -110,8 +109,8 @@ public class CommandTurret extends SubsystemBase {
             turretMotor.set(0);
         }
 
-        targetDistance = getTargetDistance();
-
+        // Shooting
+        targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
         if (currentMode == Mode.SHOOTING || currentMode == Mode.MANUAL) {
             shooterMotor.set(shooterVelocityMap.get(targetDistance));
             if (timer.hasElapsed(0.5)) {
