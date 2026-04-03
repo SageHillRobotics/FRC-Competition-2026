@@ -43,7 +43,7 @@ public class CommandTurret extends SubsystemBase {
     private TalonFX shooterMotor = new TalonFX(20);
     private SparkMax indexerMotor = new SparkMax(5, MotorType.kBrushless);
 
-    private PIDController turretPID = new PIDController(0.5, 0, 0); //! TODO: Tune turretPID
+    private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
 
     private Mode currentMode = Mode.IDLE;
     private double targetDistance = 0;
