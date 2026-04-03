@@ -45,7 +45,7 @@ public class CommandTurret extends SubsystemBase {
     private TalonFX shooterMotor = new TalonFX(20);
     private SparkMax indexerMotor = new SparkMax(5, MotorType.kBrushless);
 
-    private PIDController turretPID = new PIDController(0.1, 0, 0); //! TODO: Tune turretPID
+    private PIDController turretPID = new PIDController(0.02, 0, 0); //! TODO: Tune turretPID
 
     private Mode currentMode = Mode.IDLE;
     private double targetDistance = 0;
@@ -112,13 +112,13 @@ public class CommandTurret extends SubsystemBase {
         // Shooting
         targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
         if (currentMode == Mode.SHOOTING || currentMode == Mode.MANUAL) {
-            shooterMotor.set(shooterVelocityMap.get(targetDistance));
+            shooterMotor.set(-shooterVelocityMap.get(targetDistance));
             if (timer.hasElapsed(0.5)) {
                 tunnelMotor.set(1);
                 indexerMotor.set(1);
             }
         } else if (currentMode == Mode.ANTISTUCK) {
-            shooterMotor.set(-1);
+            shooterMotor.set(1);
             tunnelMotor.set(-1);
             indexerMotor.set(-1);
         } else {
