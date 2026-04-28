@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
@@ -24,11 +23,10 @@ import java.util.Set;
 
 public class CommandTurret extends SubsystemBase {
     private enum Mode {
-        IDLE, SHOOTING, MANUAL, ANTISTUCK
+        IDLE, SHOOTING
     }
 
     private CommandSwerveDrivetrain drivetrain;
-    private CommandXboxController joystick;
 
     private static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     private static final InterpolatingDoubleTreeMap shooterVelocityMap = new InterpolatingDoubleTreeMap();
@@ -51,9 +49,8 @@ public class CommandTurret extends SubsystemBase {
     private double targetDistance = 0;
     private Timer timer = new Timer();
 
-    public CommandTurret(CommandSwerveDrivetrain drivetrain, CommandXboxController joystick) {
+    public CommandTurret(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
-        this.joystick = joystick;
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = turretLimitRotations;
@@ -73,12 +70,6 @@ public class CommandTurret extends SubsystemBase {
     public Command toggleShoot() {
         return setMode(Mode.SHOOTING);
     }
-    public Command toggleManual() {
-        return setMode(Mode.MANUAL);
-    }
-    public Command toggleAntistuck() {
-        return setMode(Mode.ANTISTUCK);
-    }
 
     @Override
     public void periodic() {
@@ -95,32 +86,18 @@ public class CommandTurret extends SubsystemBase {
         // Turret Rotation
         if (currentMode == Mode.SHOOTING && (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? blueHubTags : redHubTags).contains((int) LimelightHelpers.getFiducialID("limelight"))) {
             turretMotor.set(turretPID.calculate(LimelightHelpers.getTX("limelight")));
-        } else if (currentMode == Mode.MANUAL) {
-            if (joystick.leftBumper().getAsBoolean()) {
-                turretMotor.set(-1);
-            } else if (joystick.rightBumper().getAsBoolean()) {
-                turretMotor.set(1);
-            } else if (joystick.x().getAsBoolean()) {
-                turretMotor.set(turretPID.calculate(turretMotor.getPosition().getValueAsDouble(), 0));
-            } else {
-                turretMotor.set(0);
-            }
         } else {
             turretMotor.set(0);
         }
 
         // Shooting
         targetDistance = fieldLayout.getTagPose(DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? 26 : 10).get().getTranslation().toTranslation2d().getDistance(drivetrain.getState().Pose.getTranslation());
-        if (currentMode == Mode.SHOOTING || currentMode == Mode.MANUAL) {
+        if (currentMode == Mode.SHOOTING) {
             shooterMotor.set(-shooterVelocityMap.get(targetDistance));
             if (timer.hasElapsed(0.5)) {
                 tunnelMotor.set(1);
                 indexerMotor.set(1);
             }
-        } else if (currentMode == Mode.ANTISTUCK) {
-            shooterMotor.set(1);
-            tunnelMotor.set(-1);
-            indexerMotor.set(-1);
         } else {
             shooterMotor.set(0);
             tunnelMotor.set(0);
@@ -128,7 +105,5 @@ public class CommandTurret extends SubsystemBase {
         }
 
         SmartDashboard.putBoolean("Turret/Shooting", currentMode == Mode.SHOOTING);
-        SmartDashboard.putBoolean("Turret/Manual Mode", currentMode == Mode.MANUAL);
-        SmartDashboard.putBoolean("Turret/Jam Prevention", currentMode == Mode.ANTISTUCK);
     }
 }

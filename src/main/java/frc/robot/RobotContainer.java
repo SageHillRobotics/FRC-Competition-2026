@@ -37,7 +37,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final CommandIntake intake = new CommandIntake();
-    public final CommandTurret turret = new CommandTurret(drivetrain, joystick);
+    public final CommandTurret turret = new CommandTurret(drivetrain);
 
     private AutoFactory autoFactory = new AutoFactory(
         () -> drivetrain.getState().Pose,
@@ -77,10 +77,6 @@ public class RobotContainer {
         joystick.leftTrigger().onTrue(intake.toggleIntake());
 
         joystick.rightTrigger().onTrue(turret.toggleShoot());
-
-        joystick.a().onTrue(turret.toggleManual());
-
-        joystick.b().onTrue(turret.toggleAntistuck());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
